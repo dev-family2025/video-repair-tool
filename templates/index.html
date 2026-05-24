@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Reparador de Video Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding-top: 50px; }
+        .container { max-width: 600px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .upload-area { border: 2px dashed #007bff; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; }
+        .btn-primary { width: 100%; padding: 10px; font-weight: bold; }
+        .footer { margin-top: 20px; font-size: 0.8em; color: #6c757d; text-align: center; }
+        .lang-selector { position: absolute; top: 10px; right: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="lang-selector">
+        <select id="languageSelect" class="form-select form-select-sm" onchange="changeLanguage(this.value)">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="pt">Português</option>
+        </select>
+    </div>
+
+    <div class="header">
+        <h1 data-i18n="header-h1">🎥 Reparador de Video</h1>
+        <p class="text-muted" data-i18n="header-p">Restaura tus archivos corruptos (MP4, FLV, MPEG...)</p>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-info">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="video" class="form-label" data-i18n="label-video">Selecciona el video dañado:</label>
+            <input class="form-control" type="file" id="video" name="video" required>
+        </div>
+        <button type="submit" class="btn btn-primary" data-i18n="btn-repair">Reparar Video Now!</button>
+    </form>
+
+    {% if repaired_file %}
+    <div class="mt-4 p-3 border rounded bg-light text-center">
+        <h4 data-i18n="repaired-h4">✅ ¡Video Reparado!</h4>
+        <p data-i18n="repaired-p">Tu archivo ya está listo para ser descargado.</p>
+        <a href="{{ url_for('download_file', filename=repaired_file) }}" class="btn btn-success" data-i18n="btn-download">Descargar Video Reparado</a>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p data-i18n="footer-p">Potenciado por Python & FFmpeg. Soporta los códecs más comunes.</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const translations = {
+        es: {
+            "title": "Reparador de Video Pro",
+            "header-h1": "🎥 Reparador de Video",
+            "header-p": "Restaura tus archivos corruptos (MP4, FLV, MPEG...)",
+            "label-video": "Selecciona el video dañado:",
+            "btn-repair": "Reparar Video Now!",
+            "repaired-h4": "✅ ¡Video Reparado!",
+            "repaired-p": "Tu archivo ya está listo para ser descargado.",
+            "btn-download": "Descargar Video Reparado",
+            "footer-p": "Potenciado por Python & FFmpeg. Soporta los códecs más comunes."
+        },
+        en: {
+            "title": "Video Repair Pro",
+            "header-h1": "🎥 Video Repair",
+            "header-p": "Restore your corrupt files (MP4, FLV, MPEG...)",
+            "label-video": "Select the damaged video:",
+            "btn-repair": "Repair Video Now!",
+            "repaired-h4": "✅ Video Repaired!",
+            "repaired-p": "Your file is ready for download.",
+            "btn-download": "Download Repaired Video",
+            "footer-p": "Powered by Python & FFmpeg. Supports most common codecs."
+        },
+        pt: {
+            "title": "Reparador de Vídeo Pro",
+            "header-h1": "🎥 Reparador de Vídeo",
+            "header-p": "Restaure seus arquivos corrompidos (MP4, FLV, MPEG...)",
+            "label-video": "Selecione o vídeo danificado:",
+            "btn-repair": "Reparar Vídeo Agora!",
+            "repaired-h4": "✅ Vídeo Reparado!",
+            "repaired-p": "Seu arquivo está pronto para ser baixado.",
+            "btn-download": "Baixar Vídeo Reparado",
+            "footer-p": "Desenvolvido com Python & FFmpeg. Suporta os codecs mais comuns."
+        }
+    };
+
+    function changeLanguage(lang) {
+        document.querySelectorAll("[data-i18n]").forEach(element => {
+            const key = element.getAttribute("data-i18n");
+            if (translations[lang][key]) {
+                if (element.tagName === "TITLE") {
+                    document.title = translations[lang][key];
+                } else {
+                    element.innerHTML = translations[lang][key];
+                }
+            }
+        });
+        localStorage.setItem("preferredLanguage", lang);
+    }
+
+    // Load preferred language on start
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedLang = localStorage.getItem("preferredLanguage") || "es";
+        document.getElementById("languageSelect").value = savedLang;
+        changeLanguage(savedLang);
+    });
+</script>
+</body>
+</html>
